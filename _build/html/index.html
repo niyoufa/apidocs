@@ -45,6 +45,62 @@
 <h1>Welcome to apidocs's documentation!<a class="headerlink" href="#welcome-to-apidocs-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>This first example shows how simple the API can be when using for a one-off
+item in a script or elsewhere.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">get</span>
+<span class="kn">from</span> <span class="nn">uritemplate</span> <span class="kn">import</span> <span class="n">expand</span>
+
+<span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;https://api.github.com{/user}&#39;</span>
+
+<span class="n">user</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;sigmavirus24&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This second example shows how using the class will save you time for template
+parsing and object creation. Making the template once means the URI is parsed
+once which decreases the number of <code class="xref py py-class docutils literal"><span class="pre">URITemplate</span></code> objects created and usage of the <code class="docutils literal"><span class="pre">re</span></code> module.
+This means that as soon as the file is parsed, the <code class="docutils literal"><span class="pre">User.github_url</span></code> and
+<code class="docutils literal"><span class="pre">Repository.github_url</span></code> variables are made once and only once. They're then
+usable in every instance of those classes.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">uritemplate</span> <span class="kn">import</span> <span class="n">URITemplate</span>
+
+<span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">github_url</span> <span class="o">=</span> <span class="n">URITemplate</span><span class="p">(</span><span class="s1">&#39;https://api.github.com{/user}&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">github_url</span><span class="o">.</span><span class="n">expand</span><span class="p">({</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">Repository</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">github_url</span> <span class="o">=</span> <span class="n">URITemplate</span><span class="p">(</span><span class="s1">&#39;https://api.github.com{/user}{/repo}&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">github_url</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;repo&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-uritemplate">
+<span id="api"></span><h2>API<a class="headerlink" href="#module-uritemplate" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementation-details">
+<h2>Implementation Details<a class="headerlink" href="#implementation-details" title="Permalink to this headline">¶</a></h2>
+<p>Classes, their methods, and functions in this section are not part of the API
+and as such are not meant to be used by users of <code class="docutils literal"><span class="pre">uritemplate.py</span></code>. These are
+documented here purely for reference as they are inadvertently exposed via the
+public API.</p>
+<p>For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">URITemplate</span><span class="p">(</span><span class="s1">&#39;https://api.github.com/users{/user}&#39;</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">variables</span>
+<span class="c1"># =&gt; [URIVariable(/user)]</span>
+</pre></div>
+</div>
+<p>Users can interact with <code class="xref py py-class docutils literal"><span class="pre">URIVariable</span></code> objects as they see fit, but
+their API may change and are not guaranteed to be consistent across versions.
+Code relying on methods defined on <code class="xref py py-class docutils literal"><span class="pre">URIVariable</span></code> and other classes,
+methods, and functions in this section may break in future releases.</p>
+</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -63,7 +119,12 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to apidocs's documentation!</a></li>
+<li><a class="reference internal" href="#">Welcome to apidocs's documentation!</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#module-uritemplate">API</a></li>
+<li><a class="reference internal" href="#implementation-details">Implementation Details</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 <div class="relations">
