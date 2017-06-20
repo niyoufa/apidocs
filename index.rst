@@ -10,6 +10,8 @@ Welcome to apidocs's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   template
+
 Examples
 --------
 
